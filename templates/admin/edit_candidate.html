@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Edit Candidate{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="vote-card card mb-4">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Candidate</h3>
+        <a href="{{ url_for('admin_candidates') }}" class="btn btn-sm btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i>Back to Candidates
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" name="name" 
+                       value="{{ candidate.name }}" required>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Political Party</label>
+                <input type="text" class="form-control" name="party" 
+                       value="{{ candidate.party }}" required>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Position</label>
+                <input type="text" class="form-control" name="position" 
+                       value="{{ candidate.position }}" required>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="text-center mb-3">
+                <img id="candidatePreview" 
+                     src="{{ url_for('static', filename=candidate.photo) if candidate.photo else 'https://via.placeholder.com/200' }}" 
+                     class="img-thumbnail rounded-circle" alt="Candidate Preview" 
+                     style="width: 200px; height: 200px; object-fit: cover;">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Candidate Photo</label>
+                <input type="file" class="form-control" name="photo" 
+                       id="candidatePhoto" accept="image/*">
+                <div class="form-text">Leave blank to keep current photo</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label">Biography</label>
+            <textarea class="form-control" name="bio" rows="4">{{ candidate.bio or '' }}</textarea>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-election">
+              <i class="fas fa-save me-1"></i>Update Candidate
+            </button>
+            
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" 
+                    data-bs-target="#deleteCandidateModal">
+              <i class="fas fa-trash me-1"></i>Delete Candidate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <div class="alert alert-info">
+      <h5><i class="fas fa-info-circle me-2"></i>Candidate Statistics</h5>
+      <ul class="mb-0">
+        <li>Total votes: {{ candidate.votes }}</li>
+        <li>Date added: {{ candidate.created_at or 'Unknown' }}</li>
+        <li>Last updated: {{ candidate.updated_at or 'Never' }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteCandidateModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Candidate Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to permanently delete this candidate?</p>
+        <p class="fw-bold">This will remove all associated votes and cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="{{ url_for('delete_candidate', candidate_id=candidate.id) }}" class="btn btn-danger">
+          <i class="fas fa-trash me-1"></i>Delete Candidate
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block scripts %}
+{{ super() }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Preview candidate photo
+    const photoInput = document.getElementById('candidatePhoto');
+    const previewImg = document.getElementById('candidatePreview');
+    
+    photoInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImg.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      } else {
+        // Revert to original if file selection canceled
+        previewImg.src = "{{ url_for('static', filename=candidate.photo) if candidate.photo else 'https://via.placeholder.com/200' }}";
+      }
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

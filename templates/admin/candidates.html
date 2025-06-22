@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Manage Candidates{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="fas fa-user-tie me-2"></i>Manage Candidates</h1>
+  <a href="{{ url_for('add_candidate') }}" class="btn btn-election btn-sm">
+    <i class="fas fa-plus me-1"></i>Add Candidate
+  </a>
+</div>
+
+<div class="vote-card card mb-4">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Party</th>
+            <th>Position</th>
+            <th>Votes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for candidate in candidates %}
+          <tr>
+            <td>
+              <img
+                src="{{ url_for('static', filename=candidate.photo) if candidate.photo else 'https://via.placeholder.com/40' }}"
+                class="rounded-circle" width="40" height="40" alt="{{ candidate.name }}">
+            </td>
+            <td>{{ candidate.name }}</td>
+            <td>{{ candidate.party }}</td>
+            <td>{{ candidate.position }}</td>
+            <td>{{ candidate.votes }}</td>
+            <td>
+              <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}"
+                class="btn btn-sm btn-outline-primary me-1">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a href="#" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                data-bs-target="#deleteModal{{ candidate.id }}">
+                <i class="fas fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

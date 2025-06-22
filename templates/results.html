@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Election Results{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+  <h1 class="display-4 fw-bold"><i class="fas fa-fire text-danger me-2"></i>Live Election Results</h1>
+  <p class="lead">Results update every 15 seconds - Last refresh: <span id="lastRefresh">Just now</span></p>
+  <div class="d-flex justify-content-center">
+    <div class="badge bg-info py-2 px-3 fs-6">
+      <i class="fas fa-bolt me-1"></i> {{ precinct_reporting }}% of precincts reporting
+    </div>
+  </div>
+</div>
+
+<!-- Results Summary -->
+<div class="vote-card card mb-5">
+  <div class="card-header bg-white">
+    <div class="row">
+      <div class="col-md-6">
+        <h3 class="mb-0">National Representative</h3>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <button id="refreshResults" class="btn btn-sm btn-election">
+          <i class="fas fa-sync-alt me-1"></i>Refresh Now
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <!-- Leaderboard -->
+      <div class="col-md-5">
+        <div class="list-group">
+          {% for candidate in candidates %}
+          <div class="list-group-item position-relative">
+            {% if loop.first %}
+              <span class="leader-badge"><i class="fas fa-crown"></i></span>
+            {% endif %}
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{ candidate.name }}</h5>
+              <span class="vote-counter">{{ candidate.votes }}</span>
+            </div>
+            <div class="d-flex align-items-center mt-2">
+              <div class="progress flex-grow-1 me-2" style="height: 10px;">
+                <div class="progress-bar bg-election" 
+                     style="width: {{ candidate.percentage }}%;"></div>
+              </div>
+              <small>{{ candidate.percentage }}%</small>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <!-- Visualization -->
+      <div class="col-md-7">
+        <canvas id="resultsChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Geographic Distribution -->
+<div class="vote-card card mb-4">
+  <div class="card-header bg-white">
+    <h4 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Regional Breakdown</h4>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>Leader</th>
+            <th>Vote Share</th>
+            <th>Margin</th>
+            <th>Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Northeast</td>
+            <td>Alex Morgan</td>
+            <td>54.2%</td>
+            <td class="text-success">+12.4%</td>
+            <td>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-success" style="width: 92%"></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Southwest</td>
+            <td>Sarah Chen</td>
+            <td>48.7%</td>
+            <td class="text-success">+8.2%</td>
+            <td>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-info" style="width: 85%"></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Central</td>
+            <td>James Wilson</td>
+            <td>51.3%</td>
+            <td class="text-success">+5.7%</td>
+            <td>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-warning" style="width: 78%"></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Western</td>
+            <td>Alex Morgan</td>
+            <td>46.8%</td>
+            <td class="text-danger">-3.2%</td>
+            <td>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-danger" style="width: 65%"></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize results chart
+    const ctx = document.getElementById('resultsChart').getContext('2d');
+    const resultsChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [
+          {% for candidate in candidates %}
+            "{{ candidate.name }}"{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ],
+        datasets: [{
+          label: 'Votes',
+          data: [
+            {% for candidate in candidates %}
+              {{ candidate.votes }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ],
+          backgroundColor: [
+            'rgba(13, 59, 102, 0.8)',
+            'rgba(196, 32, 33, 0.8)',
+            'rgba(40, 167, 69, 0.8)',
+            'rgba(253, 126, 20, 0.8)'
+          ],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return value.toLocaleString();
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    // Refresh simulation
+    setInterval(() => {
+      document.getElementById('lastRefresh').textContent = new Date().toLocaleTimeString();
+    }, 15000);
+    
+    // Manual refresh
+    document.getElementById('refreshResults').addEventListener('click', function() {
+      document.getElementById('lastRefresh').textContent = new Date().toLocaleTimeString();
+    });
+  });
+</script>
+{% endblock %}

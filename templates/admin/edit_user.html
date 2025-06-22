@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="vote-card card mb-4">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit User</h3>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i>Back to Users
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="name" 
+                   value="{{ user.name }}" required>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Voter ID</label>
+            <input type="text" class="form-control" name="voter_id" 
+                   value="{{ user.voter_id }}" required>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">New Password (leave blank to keep current)</label>
+            <input type="password" class="form-control" name="password">
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label">User Role</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="role" 
+                     id="roleVoter" value="voter" 
+                     {{ 'checked' if user.role == 'voter' }}>
+              <label class="form-check-label" for="roleVoter">
+                Voter
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="role" 
+                     id="roleAdmin" value="admin"
+                     {{ 'checked' if user.role == 'admin' }}>
+              <label class="form-check-label" for="roleAdmin">
+                Administrator
+              </label>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-election">
+              <i class="fas fa-save me-1"></i>Update User
+            </button>
+            
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" 
+                    data-bs-target="#deleteUserModal">
+              <i class="fas fa-trash me-1"></i>Delete User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <div class="alert alert-info">
+      <h5><i class="fas fa-info-circle me-2"></i>User Status</h5>
+      <ul class="mb-0">
+        <li>Account created: {{ user.created_at or 'Unknown' }}</li>
+        <li>Vote status: 
+          {% if user.has_voted %}
+            <span class="text-success">Voted</span>
+          {% else %}
+            <span class="text-warning">Not voted</span>
+          {% endif %}
+        </li>
+        <li>Last login: {{ user.last_login or 'Never' }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm User Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to permanently delete this user?</p>
+        <p class="fw-bold">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="{{ url_for('delete_user', user_id=user.id) }}" class="btn btn-danger">
+          <i class="fas fa-trash me-1"></i>Delete User
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

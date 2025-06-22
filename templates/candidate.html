@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ candidate.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- Candidate Summary -->
+  <div class="col-lg-5 mb-4">
+    <div class="vote-card card">
+      <div class="card-body text-center">
+        <img src="{{ url_for('static', filename=candidate.photo) if candidate.photo else 'https://via.placeholder.com/150' }}" 
+             class="rounded-circle mb-3" width="150" height="150" alt="{{ candidate.name }}">
+        <h2>{{ candidate.name }}</h2>
+        <p class="text-muted">{{ candidate.party }} | {{ candidate.position }}</p>
+        
+        <div class="d-flex justify-content-center mb-3">
+          <div class="badge bg-primary py-2 px-3 me-2">
+            <i class="fas fa-medal me-1"></i>Rank #{{ rank }}
+          </div>
+          <div class="badge bg-success py-2 px-3">
+            <i class="fas fa-percent me-1"></i>{{ vote_share }}% Vote Share
+          </div>
+        </div>
+        
+        <div class="d-grid gap-2 mb-4">
+          {% if not session.has_voted %}
+          <form method="POST" action="{{ url_for('vote', candidate_id=candidate.id) }}">
+            <button type="submit" class="btn btn-election btn-lg w-100">
+              <i class="fas fa-vote-yea me-1"></i>Vote for {{ candidate.name.split(' ')[0] }}
+            </button>
+          </form>
+          {% else %}
+          <button class="btn btn-outline-secondary btn-lg w-100" disabled>
+            <i class="fas fa-check-circle me-1"></i>You've Already Voted
+          </button>
+          {% endif %}
+        </div>
+        
+        <div class="row text-center">
+          <div class="col-6">
+            <div class="display-6 vote-counter">{{ candidate.votes }}</div>
+            <p class="text-muted">Total Votes</p>
+          </div>
+          <div class="col-6">
+            <div class="display-6 vote-counter">{{ total_votes }}</div>
+            <p class="text-muted">Total Votes Cast</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Candidate Details -->
+  <div class="col-lg-7">
+    <div class="vote-card card mb-4">
+      <div class="card-header bg-white">
+        <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Candidate Information</h4>
+      </div>
+      <div class="card-body">
+        <h5 class="mb-3">Biography</h5>
+        <p class="mb-4">{{ candidate.bio or 'No biography available' }}</p>
+        
+        <h5 class="mb-3">Campaign Promises</h5>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <i class="fas fa-check-circle text-success me-2"></i>Education reform and increased funding
+          </li>
+          <li class="list-group-item">
+            <i class="fas fa-check-circle text-success me-2"></i>Healthcare accessibility improvements
+          </li>
+          <li class="list-group-item">
+            <i class="fas fa-check-circle text-success me-2"></i>Economic development initiatives
+          </li>
+          <li class="list-group-item">
+            <i class="fas fa-check-circle text-success me-2"></i>Environmental protection policies
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="vote-card card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Performance Metrics</h4>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6 mb-3">
+            <div class="d-flex justify-content-between">
+              <span>Vote Momentum</span>
+              <strong>+12.4%</strong>
+            </div>
+            <div class="progress mt-2" style="height: 10px;">
+              <div class="progress-bar bg-success" style="width: 75%"></div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="d-flex justify-content-between">
+              <span>Approval Rating</span>
+              <strong>68%</strong>
+            </div>
+            <div class="progress mt-2" style="height: 10px;">
+              <div class="progress-bar bg-info" style="width: 68%"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <h6>Regional Support</h6>
+          <div class="d-flex justify-content-between mb-1">
+            <span>Northeast</span>
+            <span>54.2%</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-primary" style="width: 54.2%"></div>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span>Southwest</span>
+            <span>42.7%</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-primary" style="width: 42.7%"></div>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span>Central</span>
+            <span>38.9%</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-primary" style="width: 38.9%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

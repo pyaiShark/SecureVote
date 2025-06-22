@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Add Candidate{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="vote-card card mb-4">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0"><i class="fas fa-user-tie me-2"></i>Add New Candidate</h3>
+        <a href="{{ url_for('admin_candidates') }}" class="btn btn-sm btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i>Back to Candidates
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" name="name" required>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Political Party</label>
+                <input type="text" class="form-control" name="party" required>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Position</label>
+                <input type="text" class="form-control" name="position" required>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="text-center mb-3">
+                <img id="candidatePreview" src="https://via.placeholder.com/200" 
+                     class="img-thumbnail rounded-circle" alt="Candidate Preview" style="width: 200px; height: 200px; object-fit: cover;">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Candidate Photo</label>
+                <input type="file" class="form-control" name="photo" id="candidatePhoto" accept="image/*">
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label">Biography</label>
+            <textarea class="form-control" name="bio" rows="4" placeholder="Candidate background, experience, and qualifications"></textarea>
+          </div>
+          
+          <div class="d-grid">
+            <button type="submit" class="btn btn-election btn-lg">
+              <i class="fas fa-save me-1"></i>Add Candidate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <div class="alert alert-info">
+      <h5><i class="fas fa-info-circle me-2"></i>Candidate Creation Guidelines</h5>
+      <ul class="mb-0">
+        <li>Use high-quality portrait photos for best results</li>
+        <li>Accepted image formats: JPG, PNG, GIF</li>
+        <li>Maximum file size: 2MB</li>
+        <li>Biography should be 50-500 characters</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% block scripts %}
+{{ super() }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Preview candidate photo
+    const photoInput = document.getElementById('candidatePhoto');
+    const previewImg = document.getElementById('candidatePreview');
+    
+    photoInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImg.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

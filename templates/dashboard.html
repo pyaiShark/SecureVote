@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Voter Dashboard{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+  <h1 class="display-4 fw-bold">Welcome, {{ session.name }}</h1>
+  <p class="lead">Review candidates and cast your vote securely</p>
+  
+  {% if has_voted %}
+  <div class="alert alert-success d-inline-block">
+    <i class="fas fa-check-circle me-2"></i>You've already cast your vote!
+  </div>
+  {% else %}
+  <div class="alert alert-warning d-inline-block">
+    <i class="fas fa-exclamation-circle me-2"></i>You haven't voted yet. Cast your vote now!
+  </div>
+  {% endif %}
+</div>
+
+<h2 class="mb-4"><i class="fas fa-users me-2"></i>Candidates</h2>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for candidate in candidates %}
+  <div class="col">
+    <div class="vote-card card h-100">
+      <div class="card-header bg-white text-center">
+        <h5 class="mb-0">{{ candidate.name }}</h5>
+      </div>
+      <div class="card-body text-center">
+        <img src="{{ url_for('static', filename=candidate.photo) if candidate.photo else 'https://via.placeholder.com/150' }}" 
+             class="rounded-circle mb-3" width="120" height="120" alt="{{ candidate.name }}">
+        <h6 class="text-muted">{{ candidate.party }}</h6>
+        <p class="mb-3">{{ candidate.position }}</p>
+        
+        <div class="d-grid gap-2">
+          <a href="{{ url_for('candidate_details', candidate_id=candidate.id) }}" class="btn btn-outline-election">
+            <i class="fas fa-info-circle me-1"></i>View Details
+          </a>
+          {% if not has_voted %}
+          <form method="POST" action="{{ url_for('vote', candidate_id=candidate.id) }}">
+            <button type="submit" class="btn btn-election w-100">
+              <i class="fas fa-vote-yea me-1"></i>Vote for {{ candidate.name.split(' ')[0] }}
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-footer text-center">
+        <small class="text-muted">Current Votes: {{ candidate.votes }}</small>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

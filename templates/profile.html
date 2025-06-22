@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="vote-card card mb-4">
+      <div class="card-header bg-white">
+        <h3 class="mb-0"><i class="fas fa-user-circle me-2"></i>My Profile</h3>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- User Details -->
+          <div class="col-md-6">
+            <div class="d-flex align-items-center mb-4">
+              <div class="bg-election text-white rounded-circle d-flex align-items-center justify-content-center"
+                style="width: 80px; height: 80px; font-size: 2rem;">
+                {{ user.name[0] }}
+              </div>
+              <div class="ms-3">
+                <h4 class="mb-0">{{ user.name }}</h4>
+                <p class="text-muted mb-0">{{ user.voter_id }}</p>
+              </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-info-circle me-2"></i>Account Details</h5>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item px-0 d-flex justify-content-between">
+                    <span>Role:</span>
+                    <span class="fw-bold">
+                      {% if user.role == 'admin' %}
+                      <span class="badge bg-primary">Administrator</span>
+                      {% else %}
+                      <span class="badge bg-secondary">Voter</span>
+                      {% endif %}
+                    </span>
+                  </li>
+                  <li class="list-group-item px-0 d-flex justify-content-between">
+                    <span>Last Login:</span>
+                    <span class="fw-bold">{{ last_login | format_datetime }}</span>
+                  </li>
+                  <li class="list-group-item px-0 d-flex justify-content-between">
+                    <span>Voting Status:</span>
+                    <span class="fw-bold">
+                      {% if user.has_voted %}
+                      <span class="text-success">Voted</span>
+                      {% else %}
+                      <span class="text-warning">Not Voted</span>
+                      {% endif %}
+                    </span>
+                  </li>
+                  <li class="list-group-item px-0 d-flex justify-content-between">
+                    <span>Account Created:</span>
+                    <span class="fw-bold">{{ user.last_login | format_datetime }}</span>
+                  </li>
+                  <li class="list-group-item px-0 d-flex justify-content-between">
+                    <span>Last Login:</span>
+                    <span class="fw-bold">{{ session.get('last_login', 'Never') }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password Update -->
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-lock me-2"></i>Change Password</h5>
+                <p class="text-muted">Update your account password</p>
+
+                <form method="POST" action="{{ url_for('change_password') }}">
+                  <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" name="current_password" required>
+                      <span class="input-group-text"><i class="fas fa-key"></i></span>
+                    </div>
+                  </div>
+
+                  <div class="mb-3 password-field-group">
+                    <label class="form-label">New Password</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" name="new_password" required id="newPasswordInput">
+                      <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    </div>
+                    <div class="form-text">At least 8 characters</div>
+                    <div class="password-strength">
+                      <div class="password-strength-meter"></div>
+                    </div>
+                    <div class="password-strength-feedback mt-1 small"></div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="form-label">Confirm New Password</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" name="confirm_password" required>
+                      <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    </div>
+                  </div>
+
+                  <div class="d-grid">
+                    <button type="submit" class="btn btn-election">
+                      <i class="fas fa-save me-1"></i>Update Password
+                    </button>
+                  </div>
+                </form>
+
+                <div class="mt-4">
+                  <h6><i class="fas fa-shield-alt me-2"></i>Security Tips</h6>
+                  <ul class="small text-muted">
+                    <li>Use a unique password for this account</li>
+                    <li>Include numbers, symbols, and mixed case letters</li>
+                    <li>Avoid common words and personal information</li>
+                    <li>Consider using a password manager</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if user.role == 'admin' %}
+    <div class="vote-card card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Admin Quick Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2 d-md-flex">
+          <a href="{{ url_for('admin_users') }}" class="btn btn-outline-election">
+            <i class="fas fa-users me-1"></i>Manage Users
+          </a>
+          <a href="{{ url_for('admin_candidates') }}" class="btn btn-outline-election">
+            <i class="fas fa-user-tie me-1"></i>Manage Candidates
+          </a>
+          <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-election">
+            <i class="fas fa-chart-bar me-1"></i>View Analytics
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const passwordInputs = document.querySelectorAll('input[name="new_password"]');
+
+    passwordInputs.forEach(input => {
+      input.addEventListener('input', function () {
+        const password = this.value;
+        const formGroup = this.closest('.password-field-group');
+        const strengthMeter = formGroup.querySelector('.password-strength-meter');
+        const feedback = formGroup.querySelector('.password-strength-feedback');
+
+        if (!strengthMeter || !feedback) return;
+
+        // Reset
+        strengthMeter.style.width = '0%';
+        strengthMeter.style.backgroundColor = '#e9ecef';
+        feedback.textContent = '';
+
+        if (password.length === 0) return;
+
+        let strength = 0;
+        let messages = [];
+
+        // Length check
+        if (password.length >= 8) strength += 30;
+        if (password.length >= 12) strength += 20;
+
+        // Complexity checks
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+        if (hasUppercase) strength += 15;
+        if (hasLowercase) strength += 15;
+        if (hasNumber) strength += 15;
+        if (hasSpecial) strength += 15;
+
+        // Cap at 100%
+        strength = Math.min(strength, 100);
+
+        // Set feedback messages
+        if (password.length < 8) {
+          messages.push('too short');
+        }
+        if (!hasUppercase) {
+          messages.push('add uppercase letters');
+        }
+        if (!hasLowercase) {
+          messages.push('add lowercase letters');
+        }
+        if (!hasNumber) {
+          messages.push('add numbers');
+        }
+        if (!hasSpecial) {
+          messages.push('add special characters');
+        }
+
+        // Update UI
+        strengthMeter.style.width = strength + '%';
+
+        if (strength < 40) {
+          strengthMeter.style.backgroundColor = '#dc3545';
+          feedback.textContent = 'Weak: ' + messages.join(', ');
+          feedback.style.color = '#dc3545';
+        } else if (strength < 50) {
+          strengthMeter.style.backgroundColor = '#ffc107';
+          feedback.textContent = 'Medium: ' + messages.join(', ');
+          feedback.style.color = '#ffc107';
+        } else {
+          strengthMeter.style.backgroundColor = '#28a745';
+          feedback.textContent = 'Strong password!';
+          feedback.style.color = '#28a745';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

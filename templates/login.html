@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Voter Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="vote-card card p-4">
+      <div class="card-body">
+        <h2 class="text-center mb-4"><i class="fas fa-user-shield me-2"></i>Voter Authentication</h2>
+
+        <!-- Login Form -->
+        <form id="loginForm" action="/login" method="POST">
+          <div class="mb-3">
+            <label class="form-label">Voter ID</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+              <input type="text" class="form-control" name="voter_id" placeholder="Enter your registered Voter ID"
+                required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control" name="password" placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="remember">
+            <label class="form-check-label" for="remember">Remember me</label>
+          </div>
+
+          <button type="submit" class="btn btn-election w-100 py-2 mb-3">
+            <i class="fas fa-unlock-alt me-2"></i>Authenticate
+          </button>
+
+          <!-- Error Messages -->
+          <div id="loginError" class="alert alert-danger mt-3 d-none"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
